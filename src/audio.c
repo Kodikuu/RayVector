@@ -255,10 +255,7 @@ void work_thread(void *opaque) {
             apply_fft_binning(ctx->processing, &ctx->vis_array[k]);
             apply_sensitivity(ctx->processing, &ctx->vis_array[k]);
         }
-        Sleep(5);
     }
     audio_destroy(ctx->processing);
     ctx->processing->work_running = 0;
-
-
 }
