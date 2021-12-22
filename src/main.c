@@ -59,7 +59,7 @@ static uint32_t init_all(context **ctx_out) {
     Color tmp = {38, 37, 36, 255};
     uint32_t opacities[4] = {63, 127, 191, 255};
 
-    uint32_t bands[4] = {8, 16, 32, 64};
+    uint32_t bands[4] = {9, 17, 33, 65};
     
     for (uint32_t i = 0; i < ctx->vis_count ; i++) {
         uint32_t index = 4 - ctx->vis_count + i;
