@@ -163,6 +163,7 @@ void apply_fft_filter(audio_processing *audio_ctx) {
     double kfft_a = exp(-2 / (0.1 * 1));
     double kfft_d = exp(-2 / (0.1 * 1));
     double scalar = 1 / sqrt(audio_ctx->fft_size);
+    memset(audio_ctx->fft_output_filtered, 0, audio_ctx->fft_size * sizeof(float));
     for (uint32_t bin = 0; bin < audio_ctx->fft_size; bin++) {
         double x0 = audio_ctx->fft_output_filtered[bin];
         kiss_fft_cpx piece = audio_ctx->fft_output_raw[bin];
