@@ -102,7 +102,7 @@ void audio_stop_capture(IAudioClient *audio_client, IAudioCaptureClient **captur
 }
 
 uint32_t audio_start_capture(IAudioClient *audio_client, WAVEFORMATEX *wfx, IAudioCaptureClient **capture_client) {
-    uint32_t e = IAudioClient_Initialize(audio_client, AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK, 10000000, 0, wfx, NULL);
+    uint32_t e = IAudioClient_Initialize(audio_client, AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK, 100000, 0, wfx, NULL);
     if (e != S_OK)
         goto except;
     
