@@ -151,11 +151,9 @@ void draw_main(void *opaque) {
 
 
 uint32_t main(void) {
-    printf("Init\n");
     context *ctx = NULL;
     init_all(&ctx);
     ctx->running = 1;
-    printf("%s: %d\n", __FUNCTION__, __LINE__);
     MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);
 
     SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT);

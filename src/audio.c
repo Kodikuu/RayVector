@@ -24,7 +24,6 @@ typedef struct internal {
 
 void audio_destroy(audio_processing *audio_ctx) {
     internal *internals = audio_ctx->internals;
-    printf("Fuck\n");
     if (audio_ctx->internals) {
         if (internals->capture)
             audio_stop_capture(internals->audio, &internals->capture);
