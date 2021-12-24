@@ -117,21 +117,14 @@ void draw_vis(struct visualiser vis, uint32_t scr_width, uint32_t scr_height) {
         // Cap
         Vector2 p1 = {width_step*(i+1), start_y - floorf(vis.band_data[i + 1]*vis.height)};
         Vector2 p2 = {width_step*i, start_y - floorf(vis.band_data[i]*vis.height)};
-        Vector2 p3;
-        p3.y = start_y - min_top;
-        if (vis.band_data[i] <= vis.band_data[i+1]) {
-            p3.x = width_step*(i+1);
-        } else {
-            p3.x = width_step*(i);
-        }
+        Vector2 p3 = {width_step*i, start_y};
         DrawTriangle(p1, p2, p3, vis.colour);
 
         // Base
-        Rectangle rect = {
-            width_step*i, start_y - min_top,
-            width_step, min_top
-        };
-        DrawRectangleRec(rect, vis.colour);
+        Vector2 p4 = {width_step*(i+1), start_y - floorf(vis.band_data[i + 1]*vis.height)};
+        Vector2 p5 = {width_step*i, start_y };
+        Vector2 p6 = {width_step*(i+1), start_y};
+        DrawTriangle(p4, p5, p6, vis.colour);
     }
     return;
 }
