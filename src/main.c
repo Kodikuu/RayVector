@@ -57,7 +57,7 @@ static uint32_t init_all(context **ctx_out) {
     uint32_t heights[4] = {180, 170, 160, 150};
 
     Color tmp = {38, 37, 36, 255};
-    uint32_t opacities[4] = {63, 127, 191, 255};
+    uint8_t opacities[4] = {63, 127, 191, 255};
 
     uint32_t bands[4] = {9, 17, 33, 65};
     
@@ -106,14 +106,12 @@ void auto_resize(uint32_t *width, uint32_t *height) {
     }
 }
 
-void draw_vis(struct visualiser vis, uint32_t scr_width, uint32_t scr_height) {
+void draw_vis(struct visualiser vis) {
     float start_y = (float) vis.position_y;
-    float width_step = (float) scr_width / (float) (vis.bands - 1);
+    float width_step = (float) vis.width / (float) (vis.bands - 1);
 
     
     for (uint32_t i=0; i < vis.bands-1; i++) {
-        float min_top = min(vis.band_data[i], vis.band_data[i+1]) * vis.height;
-
         // Cap
         Vector2 p1 = {width_step*(i+1), start_y - floorf(vis.band_data[i + 1]*vis.height)};
         Vector2 p2 = {width_step*i, start_y - floorf(vis.band_data[i]*vis.height)};
@@ -136,7 +134,7 @@ void draw_main(void *opaque) {
     ClearBackground(BLANK);
 
     for (uint32_t i=0; i<ctx->vis_count; i++) {
-        draw_vis(ctx->vis_array[i], ctx->resolution_w, ctx->resolution_h);
+        draw_vis(ctx->vis_array[i]);
     }
 
     EndDrawing();

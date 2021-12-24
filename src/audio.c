@@ -70,7 +70,11 @@ void audio_destroy(audio_processing *audio_ctx) {
     }
 }
 
-void calc_hanning_window(audio_processing *audio_ctx);
+void calc_hanning_window(audio_processing *audio_ctx) {
+    for(uint32_t bin = 0; bin < audio_ctx->fft_size; bin++) {
+        audio_ctx->hanning_window[bin]	= (0.5 * (1.0 - cos(M_PI*2.0*bin/(audio_ctx->fft_size-1))));
+    }
+}
 
 uint32_t audio_init(audio_processing **audio_ctx) {
     uint32_t e = 0;
@@ -131,12 +135,6 @@ void BufferDemux(float *bufferA, float* bufferB, uint32_t sizeA) {
     }
 }
 
-void calc_hanning_window(audio_processing *audio_ctx) {
-    for(uint32_t bin = 0; bin < audio_ctx->fft_size; bin++) {
-        audio_ctx->hanning_window[bin]	= (double) (0.5 * (1.0 - cos(M_PI*2*bin/(audio_ctx->fft_size-1))));
-    }
-}
-
 void calc_band_freqs(visualiser *vis_ctx) {
     if (vis_ctx->band_freqs)
         free(vis_ctx->band_freqs);
@@ -154,8 +152,7 @@ void calc_band_freqs(visualiser *vis_ctx) {
 void apply_hanning(audio_processing *audio_ctx) {
 
     for (uint32_t i = 0; i<audio_ctx->fft_size; i++) {
-        audio_ctx->fft_input[i] = audio_ctx->buffer_input[i] * audio_ctx->hanning_window[i];
-    }
+        audio_ctx->fft_input[i] = (float) (audio_ctx->buffer_input[i] * audio_ctx->hanning_window[i]);    }
 }
 
 void apply_fft_filter(audio_processing *audio_ctx) {
@@ -172,7 +169,7 @@ void apply_fft_filter(audio_processing *audio_ctx) {
         } else {
             x0 = x1 + kfft_d*(x0-x1);
         }
-        audio_ctx->fft_output_filtered[bin] = x0;
+        audio_ctx->fft_output_filtered[bin] = (float) x0;
     }
 }
 
@@ -205,10 +202,10 @@ void apply_fft_binning(audio_processing *audio_ctx, visualiser *vis_ctx) {
     }
 }
 
-void apply_sensitivity(audio_processing *audio_ctx, visualiser *vis_ctx) {
+void apply_sensitivity(visualiser *vis_ctx) {
     for (uint32_t i = 0; i < vis_ctx->bands; i++) {
         vis_ctx->band_data[i] = max(0.0f, min(1.0f, vis_ctx->band_data[i])); // Limit domain
-        vis_ctx->band_data[i] = max(0.0, (10.0/vis_ctx->sensitivity)*log10(vis_ctx->band_data[i])+1.0); // Sensitivity
+        vis_ctx->band_data[i] = max(0.0f, (float) ((10.0/vis_ctx->sensitivity)*log10(vis_ctx->band_data[i])+1.0)); // Sensitivity
     }
 }
 
@@ -253,7 +250,7 @@ void work_thread(void *opaque) {
 
         for (uint32_t k = 0; k < ctx->vis_count; k++) {
             apply_fft_binning(ctx->processing, &ctx->vis_array[k]);
-            apply_sensitivity(ctx->processing, &ctx->vis_array[k]);
+            apply_sensitivity(&ctx->vis_array[k]);
         }
     }
     audio_destroy(ctx->processing);
