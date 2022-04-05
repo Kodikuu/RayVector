@@ -34,7 +34,8 @@ LIBS = \
 FLAGS = \
 	/W4 \
 	/DWIN32_LEAN_AND_MEAN \
-	/DUNICODE
+	/DUNICODE \
+	/GL \
 	/MD \
 
 CFLAGS = $(INCLUDES) $(FLAGS)
