@@ -29,17 +29,19 @@ LIBS = \
 	Ws2_32.lib \
 	Shlwapi.lib \
 	Winmm.lib \
+	Shell32.lib \
 
 FLAGS = \
 	/W4 \
 	/DWIN32_LEAN_AND_MEAN \
 	/DUNICODE
+	/MD \
 
 CFLAGS = $(INCLUDES) $(FLAGS)
 CPPFLAGS = $(INCLUDES) $(FLAGS)
 
 all: $(OBJS)
-	link $(BUILD) $(LIBS)
+	link $(BUILD) $(LIBS) /LTCG
 	del *.obj
 
 run:
