@@ -42,7 +42,7 @@ CFLAGS = $(INCLUDES) $(FLAGS)
 CPPFLAGS = $(INCLUDES) $(FLAGS)
 
 all: $(OBJS)
-	link $(BUILD) $(LIBS) /LTCG
+	link $(BUILD) $(LIBS) /LTCG /subsystem:console /NODEFAULTLIB:LIBCMT
 	del *.obj
 
 run:
