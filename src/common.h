@@ -54,7 +54,7 @@ typedef struct context {
     uint32_t refresh_rate;
     uint32_t running;
 
-    // Cisualisers
+    // Visualisers
     uint32_t vis_count;
     visualiser *vis_array;
 
