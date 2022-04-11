@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 #include "kiss_fft130/kiss_fftr.h"
+
+#pragma warning(disable: 4201)
 #include "matoya.h"
 
 typedef struct audio_processing {
