@@ -46,4 +46,4 @@ all: $(OBJS)
 	del *.obj
 
 run:
-	.\main.exe 
+	.\main.exe
