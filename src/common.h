@@ -60,4 +60,7 @@ typedef struct context {
 
     // Audio Processing
     audio_processing *processing;
+
+	// Performance and safety
+	MTY_Mutex *lock;
 } context;

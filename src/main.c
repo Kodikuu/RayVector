@@ -19,6 +19,8 @@ static void destroy_all(context **ctx_in) {
     
     context *ctx = *ctx_in;
 
+	MTY_MutexDestroy(&ctx->lock);
+
     // Audio Processing
     if (ctx->processing) {
         free(ctx->processing);
@@ -82,6 +84,8 @@ static uint32_t init_all(context **ctx_out) {
     ctx->processing = calloc(1, sizeof(audio_processing));
     ctx->processing->fft_ms = 100;
 
+	ctx->lock = MTY_MutexCreate();
+
     return e;
 }
 
@@ -132,9 +136,11 @@ void draw_main(void *opaque) {
     BeginDrawing();
     ClearBackground(BLANK);
 
+	MTY_MutexLock(ctx->lock);
     for (uint32_t i=0; i<ctx->vis_count; i++) {
         draw_vis(ctx->vis_array[i]);
     }
+	MTY_MutexUnlock(ctx->lock);
 
     EndDrawing();
 }
@@ -146,10 +152,9 @@ uint32_t main(void) {
     ctx->running = 1;
     MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);
 
-    SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
     InitWindow(0, 0, NULL);
     ctx->refresh_rate = 165;
-    SetTargetFPS(ctx->refresh_rate);
     SetFlags(GetWindowHandle());
 
     uint32_t step = 0;
@@ -161,7 +166,6 @@ uint32_t main(void) {
         step = (step+1) % ctx->refresh_rate;
 
         draw_main(ctx);
-        WaitTime(5);
     }
     ctx->running = 0;
 

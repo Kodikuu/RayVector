@@ -248,10 +248,12 @@ void work_thread(void *opaque) {
 
         }
 
+		MTY_MutexLock(ctx->lock);
         for (uint32_t k = 0; k < ctx->vis_count; k++) {
             apply_fft_binning(ctx->processing, &ctx->vis_array[k]);
             apply_sensitivity(&ctx->vis_array[k]);
         }
+		MTY_MutexUnlock(ctx->lock);
     }
     audio_destroy(ctx->processing);
     ctx->processing->work_running = 0;
