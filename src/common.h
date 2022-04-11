@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "kiss_fft130/kiss_fftr.h"
+#include "matoya.h"
 
 typedef struct audio_processing {
     // Set in main

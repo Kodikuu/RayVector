@@ -6,7 +6,6 @@
 
 #include "raylib.h"
 #define Color Color
-#include "matoya.h"
 
 #include "common.h"
 
