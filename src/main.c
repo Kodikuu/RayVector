@@ -104,12 +104,11 @@ void auto_resize()
 	}
 }
 
-void draw_vis(struct visualiser vis) {
-    float start_y = (float) vis.position_y;
-    float width_step = (float) vis.width / (float) (vis.bands - 1);
-
+void draw_vis(struct visualiser vis)
+{
+    float y0 = (float) vis.position_y;
+    float x_step = (float) vis.width / (float) (vis.bands - 1);
     
-    for (uint32_t i=0; i < vis.bands-1; i++) {
     for (uint32_t i = 0; i < vis.bands-1; i++) {
 		float x1 = x_step * i;
 		float x2 = x1 + x_step;
@@ -124,9 +123,9 @@ void draw_vis(struct visualiser vis) {
         DrawTriangle(p1, p2, p3, vis.colour);
 
         // Base
-        Vector2 p4 = {width_step*(i+1), start_y - floorf(vis.band_data[i + 1]*vis.height)};
-        Vector2 p5 = {width_step*i, start_y };
-        Vector2 p6 = {width_step*(i+1), start_y};
+        Vector2 p4 = {x2, y2};
+        Vector2 p5 = {x1, y0};
+        Vector2 p6 = {x2, y0};
         DrawTriangle(p4, p5, p6, vis.colour);
     }
     return;
