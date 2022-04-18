@@ -12,52 +12,53 @@
 #include "audio.h"
 void SetFlags(void *handle);
 
-static void destroy_all(context **ctx_in) {
+static void destroy_all(context **ctx_in)
+{
 
-    if (!*ctx_in)
-        return;
-    
-    context *ctx = *ctx_in;
+	if (!*ctx_in)
+		return;
+	
+	context *ctx = *ctx_in;
 
 	MTY_MutexDestroy(&ctx->lock);
 
-    // Audio Processing
-    if (ctx->processing) {
-        free(ctx->processing);
-    }
-    
-    // Visualisers
-    if (ctx->vis_array) {
-        for (uint32_t i = 0; i < ctx->vis_count; i++) {
-            free(ctx->vis_array[i].band_data);
-        }
+	// Audio Processing
+	if (ctx->processing) {
+		free(ctx->processing);
+	}
+	
+	// Visualisers
+	if (ctx->vis_array) {
+		for (uint32_t i = 0; i < ctx->vis_count; i++) {
+			free(ctx->vis_array[i].band_data);
+		}
 
-        free(ctx->vis_array);
-    }
+		free(ctx->vis_array);
+	}
 
-    // Context
-    free(ctx);
+	// Context
+	free(ctx);
 
-    *ctx_in = NULL;
+	*ctx_in = NULL;
 }
 
 static uint32_t init_all(context **ctx_out)
 {
-    uint32_t e = 0;
+	uint32_t e = 0;
 
-    destroy_all(ctx_out);
+	destroy_all(ctx_out);
 
-    // Context
-    context *ctx = *ctx_out = calloc(1, sizeof(context));
-    
-    // Visualisers
-    ctx->vis_count = 4;
-    ctx->vis_array = calloc(ctx->vis_count, sizeof(visualiser));
+	// Context
+	context *ctx = *ctx_out = calloc(1, sizeof(context));
+	
+	// Visualisers
+	ctx->vis_count = 4;
+	ctx->vis_array = calloc(ctx->vis_count, sizeof(visualiser));
 
-    // Settings
+	// Settings
 
-    uint32_t heights[4] = {150, 160, 170, 180};
-    uint32_t bands[4] = {65, 33, 17, 9};
+	uint32_t heights[4] = {150, 160, 170, 180};
+	uint32_t bands[4] = {65, 33, 17, 9};
 
 	Color colours[4] = {
 		{38, 37, 36, 255},
@@ -65,29 +66,29 @@ static uint32_t init_all(context **ctx_out)
 		{38, 37, 36, 127},
 		{38, 37, 36, 63},
 	};
-    
-    for (uint32_t i = 0; i < ctx->vis_count ; i++) {
-        ctx->vis_array[i].colour = colours[i];
-        ctx->vis_array[i].height = heights[i];
-        ctx->vis_array[i].bands = bands[i];
-    
-        ctx->vis_array[i].width = 2560;
-        ctx->vis_array[i].position_x = 0;
-        ctx->vis_array[i].position_y = 1410;
-        ctx->vis_array[i].freq_min = 20;
-        ctx->vis_array[i].freq_max = 20000;
-        ctx->vis_array[i].sensitivity = 35;
-        calc_band_freqs(&ctx->vis_array[i]);
-        ctx->vis_array[i].band_data = calloc(ctx->vis_array[i].bands, sizeof(float));
-    }
+	
+	for (uint32_t i = 0; i < ctx->vis_count ; i++) {
+		ctx->vis_array[i].colour = colours[i];
+		ctx->vis_array[i].height = heights[i];
+		ctx->vis_array[i].bands = bands[i];
+	
+		ctx->vis_array[i].width = 2560;
+		ctx->vis_array[i].position_x = 0;
+		ctx->vis_array[i].position_y = 1410;
+		ctx->vis_array[i].freq_min = 20;
+		ctx->vis_array[i].freq_max = 20000;
+		ctx->vis_array[i].sensitivity = 35;
+		calc_band_freqs(&ctx->vis_array[i]);
+		ctx->vis_array[i].band_data = calloc(ctx->vis_array[i].bands, sizeof(float));
+	}
 
-    // Audio Processing
-    ctx->processing = calloc(1, sizeof(audio_processing));
-    ctx->processing->fft_ms = 100;
+	// Audio Processing
+	ctx->processing = calloc(1, sizeof(audio_processing));
+	ctx->processing->fft_ms = 100;
 
 	ctx->lock = MTY_MutexCreate();
 
-    return e;
+	return e;
 }
 
 void auto_resize()
@@ -107,80 +108,80 @@ void auto_resize()
 
 void draw_vis(struct visualiser vis)
 {
-    float y0 = (float) vis.position_y;
-    float x_step = (float) vis.width / (float) (vis.bands - 1);
-    
-    for (uint32_t i = 0; i < vis.bands-1; i++) {
+	float y0 = (float) vis.position_y;
+	float x_step = (float) vis.width / (float) (vis.bands - 1);
+	
+	for (uint32_t i = 0; i < vis.bands-1; i++) {
 		float x1 = x_step * i;
 		float x2 = x1 + x_step;
 
 		float y1 = y0 - floorf(vis.band_data[i] * vis.height);
 		float y2 = y0 - floorf(vis.band_data[i + 1] * vis.height);
 
-        // Cap
-        Vector2 p1 = {x2, y2};
-        Vector2 p2 = {x1, y1};
-        Vector2 p3 = {x1, y0};
-        DrawTriangle(p1, p2, p3, vis.colour);
+		// Cap
+		Vector2 p1 = {x2, y2};
+		Vector2 p2 = {x1, y1};
+		Vector2 p3 = {x1, y0};
+		DrawTriangle(p1, p2, p3, vis.colour);
 
-        // Base
-        Vector2 p4 = {x2, y2};
-        Vector2 p5 = {x1, y0};
-        Vector2 p6 = {x2, y0};
-        DrawTriangle(p4, p5, p6, vis.colour);
-    }
-    return;
+		// Base
+		Vector2 p4 = {x2, y2};
+		Vector2 p5 = {x1, y0};
+		Vector2 p6 = {x2, y0};
+		DrawTriangle(p4, p5, p6, vis.colour);
+	}
+	return;
 }
 
 void draw_main(void *opaque)
 {
-    struct context *ctx = (struct context *) opaque;
+	struct context *ctx = (struct context *) opaque;
 
-    BeginDrawing();
-    ClearBackground(BLANK);
+	BeginDrawing();
+	ClearBackground(BLANK);
 
 	MTY_MutexLock(ctx->lock);
 	uint32_t i = ctx->vis_count;
 	while (i--) {
-        draw_vis(ctx->vis_array[i]);
+		draw_vis(ctx->vis_array[i]);
 	}
 	MTY_MutexUnlock(ctx->lock);
 
-    EndDrawing();
+	EndDrawing();
 }
 
 
 uint32_t main(void)
 {
-    context *ctx = NULL;
-    init_all(&ctx);
-    ctx->running = 1;
-    MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);
+	context *ctx = NULL;
+	init_all(&ctx);
+	ctx->running = 1;
+	MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);
 
-    SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
-    InitWindow(0, 0, NULL);
-    ctx->refresh_rate = 165;
-    SetFlags(GetWindowHandle());
+	SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
+	InitWindow(0, 0, NULL);
+	ctx->refresh_rate = 165;
+	SetFlags(GetWindowHandle());
 
-    uint32_t step = 0;
-    while (!WindowShouldClose())
-    {
-        if (!step) {
-            auto_resize();
-        }
-        step = (step + 1) % ctx->refresh_rate;
+	uint32_t step = 0;
+	while (!WindowShouldClose())
+	{
+		if (!step) {
+			auto_resize();
+		}
+		step = (step + 1) % ctx->refresh_rate;
 
-        draw_main(ctx);
-    }
-    ctx->running = 0;
+		draw_main(ctx);
+	}
+	ctx->running = 0;
 
-    while (ctx->processing->work_running) {
-        WaitTime(1);
-    }
-    MTY_ThreadDestroy(&thread);
-    destroy_all(&ctx);
+	while (ctx->processing->work_running) {
+		WaitTime(1);
+	}
+	MTY_ThreadDestroy(&thread);
+	destroy_all(&ctx);
 
-    return 0;
+	return 0;
 }
 
 int32_t WinMain(void)
