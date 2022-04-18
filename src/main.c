@@ -55,20 +55,20 @@ static uint32_t init_all(context **ctx_out) {
 
     // Settings
 
-    uint32_t heights[4] = {180, 170, 160, 150};
+    uint32_t heights[4] = {150, 160, 170, 180};
+    uint32_t bands[4] = {65, 33, 17, 9};
 
-    Color tmp = {38, 37, 36, 255};
-    uint8_t opacities[4] = {63, 127, 191, 255};
-
-    uint32_t bands[4] = {9, 17, 33, 65};
+	Color colours[4] = {
+		{38, 37, 36, 255},
+		{38, 37, 36, 191},
+		{38, 37, 36, 127},
+		{38, 37, 36, 63},
+	};
     
     for (uint32_t i = 0; i < ctx->vis_count ; i++) {
-        uint32_t index = 4 - ctx->vis_count + i;
-        tmp.a = opacities[index];
-
-        ctx->vis_array[i].colour = tmp;
-        ctx->vis_array[i].height = heights[index];
-        ctx->vis_array[i].bands = bands[index];
+        ctx->vis_array[i].colour = colours[i];
+        ctx->vis_array[i].height = heights[i];
+        ctx->vis_array[i].bands = bands[i];
     
         ctx->vis_array[i].width = 2560;
         ctx->vis_array[i].position_x = 0;
@@ -110,10 +110,17 @@ void draw_vis(struct visualiser vis) {
 
     
     for (uint32_t i=0; i < vis.bands-1; i++) {
+    for (uint32_t i = 0; i < vis.bands-1; i++) {
+		float x1 = x_step * i;
+		float x2 = x1 + x_step;
+
+		float y1 = y0 - floorf(vis.band_data[i] * vis.height);
+		float y2 = y0 - floorf(vis.band_data[i + 1] * vis.height);
+
         // Cap
-        Vector2 p1 = {width_step*(i+1), start_y - floorf(vis.band_data[i + 1]*vis.height)};
-        Vector2 p2 = {width_step*i, start_y - floorf(vis.band_data[i]*vis.height)};
-        Vector2 p3 = {width_step*i, start_y};
+        Vector2 p1 = {x2, y2};
+        Vector2 p2 = {x1, y1};
+        Vector2 p3 = {x1, y0};
         DrawTriangle(p1, p2, p3, vis.colour);
 
         // Base
