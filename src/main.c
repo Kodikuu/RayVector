@@ -138,9 +138,10 @@ void draw_main(void *opaque) {
     ClearBackground(BLANK);
 
 	MTY_MutexLock(ctx->lock);
-    for (uint32_t i=0; i<ctx->vis_count; i++) {
+	uint32_t i = ctx->vis_count;
+	while (i--) {
         draw_vis(ctx->vis_array[i]);
-    }
+	}
 	MTY_MutexUnlock(ctx->lock);
 
     EndDrawing();
