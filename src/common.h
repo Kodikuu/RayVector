@@ -51,7 +51,7 @@ typedef struct visualiser {
 
 typedef struct context {
 	// Global attributes
-	uint32_t running;
+	bool running;
 
 	// Visualisers
 	uint32_t vis_count;

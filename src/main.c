@@ -155,7 +155,7 @@ uint32_t main(void)
 {
 	context *ctx = NULL;
 	init_all(&ctx);
-	ctx->running = 1;
+	ctx->running = true;
 	MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);
 
 	SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
@@ -163,7 +163,7 @@ uint32_t main(void)
 	SetFlags(GetWindowHandle());
 
 	MTY_Time time = 0;
-	while (!WindowShouldClose())
+	while (ctx->running)
 	{
 		MTY_Time new_time = MTY_GetTime();
 		if (MTY_TimeDiff(time, new_time) > 1000.0f) {
@@ -172,8 +172,8 @@ uint32_t main(void)
 		}
 
 		draw_main(ctx);
+		ctx->running = !WindowShouldClose();
 	}
-	ctx->running = 0;
 
 	while (ctx->processing->work_running) {
 		WaitTime(1);
