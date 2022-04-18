@@ -12,13 +12,13 @@
 #include "audio.h"
 void SetFlags(void *handle);
 
-static void destroy_all(context **ctx_in)
+static void destroy_all(struct context **ctx_in)
 {
 
 	if (!*ctx_in)
 		return;
 	
-	context *ctx = *ctx_in;
+	struct context *ctx = *ctx_in;
 
 	MTY_MutexDestroy(&ctx->lock);
 
@@ -42,18 +42,18 @@ static void destroy_all(context **ctx_in)
 	*ctx_in = NULL;
 }
 
-static uint32_t init_all(context **ctx_out)
+static uint32_t init_all(struct context **ctx_out)
 {
 	uint32_t e = 0;
 
 	destroy_all(ctx_out);
 
 	// Context
-	context *ctx = *ctx_out = calloc(1, sizeof(context));
+	struct context *ctx = *ctx_out = calloc(1, sizeof(struct context));
 	
 	// Visualisers
 	ctx->vis_count = 4;
-	ctx->vis_array = calloc(ctx->vis_count, sizeof(visualiser));
+	ctx->vis_array = calloc(ctx->vis_count, sizeof(struct visualiser));
 
 	// Settings
 
@@ -83,7 +83,7 @@ static uint32_t init_all(context **ctx_out)
 	}
 
 	// Audio Processing
-	ctx->processing = calloc(1, sizeof(audio_processing));
+	ctx->processing = calloc(1, sizeof(struct audio_processing));
 	ctx->processing->fft_ms = 100;
 
 	ctx->lock = MTY_MutexCreate();
@@ -153,7 +153,7 @@ void draw_main(void *opaque)
 
 uint32_t main(void)
 {
-	context *ctx = NULL;
+	struct context *ctx = NULL;
 	init_all(&ctx);
 	ctx->running = true;
 	MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);

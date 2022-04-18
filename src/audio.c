@@ -1,14 +1,7 @@
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
-
 #define _USE_MATH_DEFINES
 #include "math.h"
 
 #include "common.h"
-
 #include "winlib.h"
 #include "kiss_fft130/kiss_fftr.h"
 
@@ -22,7 +15,7 @@ struct internal {
 	kiss_fftr_cfg fft_cfg;
 };
 
-void audio_destroy(audio_processing *audio_ctx)
+void audio_destroy(struct audio_processing *audio_ctx)
 {
 	struct internal *internals = audio_ctx->internals;
 	if (audio_ctx->internals) {
@@ -36,52 +29,42 @@ void audio_destroy(audio_processing *audio_ctx)
 			audio_free_client(&internals->audio);
 
 		free(audio_ctx->internals);
-		audio_ctx->internals = NULL;
 	}
 
 	if (internals->fft_cfg)
 		kiss_fftr_free(internals->fft_cfg);
 
-	if (audio_ctx->buffer_input) {
+	if (audio_ctx->buffer_input)
 		free(audio_ctx->buffer_input);
-		audio_ctx->buffer_input = NULL;
-	}
-	if (audio_ctx->fft_input) {
+
+	if (audio_ctx->fft_input)
 		free(audio_ctx->fft_input);
-		audio_ctx->fft_input = NULL;
-	}
 
-	if (audio_ctx->raw_capture) {
+	if (audio_ctx->raw_capture)
 		free(audio_ctx->raw_capture);
-		audio_ctx->raw_capture = NULL;
-	}
 
-	if (audio_ctx->fft_output_raw) {
+	if (audio_ctx->fft_output_raw)
 		free(audio_ctx->fft_output_raw);
-		audio_ctx->fft_output_raw = NULL;
-	}
 
-	if (audio_ctx->fft_output_filtered) {
+	if (audio_ctx->fft_output_filtered)
 		free(audio_ctx->fft_output_filtered);
-		audio_ctx->fft_output_filtered = NULL;
-	}
 
-	if (audio_ctx->hanning_window) {
+	if (audio_ctx->hanning_window)
 		free(audio_ctx->hanning_window);
-		audio_ctx->hanning_window = NULL;
-	}
+
+	memset(audio_ctx, 0, sizeof(struct audio_processing));
 }
 
-void calc_hanning_window(audio_processing *audio_ctx)
+void calc_hanning_window(struct audio_processing *audio_ctx)
 {
 	for(uint32_t bin = 0; bin < audio_ctx->fft_size; bin++)
-		audio_ctx->hanning_window[bin]	= (0.5 * (1.0 - cos(M_PI*2.0*bin/(audio_ctx->fft_size-1))));
+		audio_ctx->hanning_window[bin]	= (0.5 * (1.0 - cos(M_PI * 2.0 * bin / (audio_ctx->fft_size - 1))));
 }
 
-uint32_t audio_init(audio_processing **audio_ctx) {
+uint32_t audio_init(struct audio_processing **audio_ctx) {
 	uint32_t e = 0;
 
-	audio_processing *ctx = *audio_ctx;
+	struct audio_processing *ctx = *audio_ctx;
 
 	if (ctx->internals)
 		audio_destroy(ctx);
@@ -107,7 +90,7 @@ uint32_t audio_init(audio_processing **audio_ctx) {
 
 	ctx->buffer_input = calloc(ctx->fft_size, sizeof(float));
 	ctx->fft_input = calloc(ctx->fft_size, sizeof(float));
-	ctx->raw_capture = calloc(ctx->fft_size*ctx->channels, sizeof(kiss_fft_cpx));
+	ctx->raw_capture = calloc(ctx->fft_size * ctx->channels, sizeof(kiss_fft_cpx));
 	ctx->fft_output_raw = calloc(ctx->fft_size, sizeof(kiss_fft_cpx));
 
 	ctx->fft_output_filtered = calloc(ctx->fft_size, sizeof(float));
@@ -125,37 +108,37 @@ void BufferShiftFloat(float **bufferA, uint32_t sizeA, uint32_t sizeB)
 {
 	float *tmp_buf = calloc(1, sizeA * sizeof(float));
 	memcpy(tmp_buf, *bufferA, sizeA * sizeof(float));
-	memcpy(*bufferA, (float *) tmp_buf+sizeB, (sizeA-sizeB) * sizeof(float));
+	memcpy(*bufferA, (float *) tmp_buf + sizeB, (sizeA - sizeB) * sizeof(float));
 	free(tmp_buf);
 }
 
 void BufferDemux(float *bufferA, float* bufferB, uint32_t sizeA)
 {
 	for (uint32_t i = 0; i < sizeA; i++)
-		bufferB[i] = (bufferA[i*2] + bufferA[i*2 + 1]) / 2;
+		bufferB[i] = (bufferA[i * 2] + bufferA[i * 2 + 1]) / 2;
 }
 
-void calc_band_freqs(visualiser *vis_ctx)
+void calc_band_freqs(struct visualiser *vis_ctx)
 {
 	if (vis_ctx->band_freqs)
 		free(vis_ctx->band_freqs);
 
 	vis_ctx->band_freqs = calloc(vis_ctx->bands, sizeof(float));
 
-	const double step	= (log(vis_ctx->freq_max/vis_ctx->freq_min) / vis_ctx->bands) / log(2.0);
-	vis_ctx->band_freqs[0]		= (float) (vis_ctx->freq_min * pow(2.0, step/2.0));
+	const double step = (log(vis_ctx->freq_max / vis_ctx->freq_min) / vis_ctx->bands) / log(2.0);
+	vis_ctx->band_freqs[0] = (float) (vis_ctx->freq_min * pow(2.0, step / 2.0));
 
 	for(uint32_t band = 1; band < vis_ctx->bands; ++band)
-		vis_ctx->band_freqs[band] = (float) (vis_ctx->band_freqs[band-1] * pow(2.0, step));
+		vis_ctx->band_freqs[band] = (float) (vis_ctx->band_freqs[band - 1] * pow(2.0, step));
 }
 
-void apply_hanning(audio_processing *audio_ctx)
+void apply_hanning(struct audio_processing *audio_ctx)
 {
 	for (uint32_t i = 0; i<audio_ctx->fft_size; i++)
 		audio_ctx->fft_input[i] = (float) (audio_ctx->buffer_input[i] * audio_ctx->hanning_window[i]);
 }
 
-void apply_fft_filter(audio_processing *audio_ctx)
+void apply_fft_filter(struct audio_processing *audio_ctx)
 {
 	double kfft_a = exp(-2 / (0.1 * 1));
 	double kfft_d = exp(-2 / (0.1 * 1));
@@ -165,19 +148,19 @@ void apply_fft_filter(audio_processing *audio_ctx)
 	for (uint32_t bin = 0; bin < audio_ctx->fft_size; bin++) {
 		double x0 = audio_ctx->fft_output_filtered[bin];
 		kiss_fft_cpx piece = audio_ctx->fft_output_raw[bin];
-		double x1 = (piece.r*piece.r + piece.i*piece.i) * scalar;
+		double x1 = (piece.r * piece.r + piece.i * piece.i) * scalar;
 
 		if (x0<x1) {
-			x0 = x1 + kfft_a*(x0-x1);
+			x0 = x1 + kfft_a * (x0 - x1);
 
 		} else {
-			x0 = x1 + kfft_d*(x0-x1);
+			x0 = x1 + kfft_d * (x0 - x1);
 		}
 		audio_ctx->fft_output_filtered[bin] = (float) x0;
 	}
 }
 
-void apply_fft_binning(audio_processing *audio_ctx, visualiser *vis_ctx)
+void apply_fft_binning(struct audio_processing *audio_ctx, struct visualiser *vis_ctx)
 {
 	const float df = 10.0f;
 	const float scalar = 2.0f / SAMPLES_PER_SEC;
@@ -187,8 +170,8 @@ void apply_fft_binning(audio_processing *audio_ctx, visualiser *vis_ctx)
 	uint32_t band = 0;
 	float f0 = 0.0f;
 
-	while ((bin <= audio_ctx->fft_size) && band < vis_ctx->bands) {
-		float fLin1 = ((float)bin+0.5f)*df;
+	while (bin <= audio_ctx->fft_size && band < vis_ctx->bands) {
+		float fLin1 = ((float) bin + 0.5f) * df;
 		float fLog1 = vis_ctx->band_freqs[band];
 
 		float x = audio_ctx->fft_output_filtered[bin];
@@ -203,23 +186,23 @@ void apply_fft_binning(audio_processing *audio_ctx, visualiser *vis_ctx)
 
 		} else {
 			vis_ctx->band_data[band] += (fLog1-f0) * x * scalar;
-			f0			= fLog1;
-			band		+= 1;
+			f0 = fLog1;
+			band += 1;
 		}
 	}
 }
 
-void apply_sensitivity(visualiser *vis_ctx)
+void apply_sensitivity(struct visualiser *vis_ctx)
 {
 	for (uint32_t i = 0; i < vis_ctx->bands; i++) {
 		vis_ctx->band_data[i] = max(0.0f, min(1.0f, vis_ctx->band_data[i])); // Limit domain
-		vis_ctx->band_data[i] = max(0.0f, (float) ((10.0/vis_ctx->sensitivity)*log10(vis_ctx->band_data[i])+1.0)); // Sensitivity
+		vis_ctx->band_data[i] = max(0.0f, (float) ((10.0 / vis_ctx->sensitivity) * log10(vis_ctx->band_data[i]) + 1.0)); // Sensitivity
 	}
 }
 
 void work_thread(void *opaque)
 {
-	context *ctx = (context *) opaque;
+	struct context *ctx = (struct context *) opaque;
 	ctx->processing->work_running = 1;
 
 	uint32_t e = audio_init(&ctx->processing);
@@ -242,10 +225,10 @@ void work_thread(void *opaque)
 		uint32_t shift_val = ctx->processing->fft_size < new_frames ? ctx->processing->fft_size : new_frames;
 
 		if (ctx->processing->channels == 2) {
-			BufferDemux(tmp_buf, ctx->processing->buffer_input+(ctx->processing->fft_size-shift_val), shift_val);
+			BufferDemux(tmp_buf, ctx->processing->buffer_input + (ctx->processing->fft_size-shift_val), shift_val);
 
 		} else {
-			memcpy(ctx->processing->buffer_input+(ctx->processing->fft_size-shift_val), tmp_buf, shift_val);
+			memcpy(ctx->processing->buffer_input + (ctx->processing->fft_size-shift_val), tmp_buf, shift_val);
 		}
 		audio_free_buffer(internals->capture, new_frames);
 

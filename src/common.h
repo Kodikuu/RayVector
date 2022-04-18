@@ -5,7 +5,7 @@
 #pragma warning(disable: 4201)
 #include "matoya.h"
 
-typedef struct audio_processing {
+struct audio_processing {
 	// Set in main
 	uint32_t fft_ms; // FFT Size in milliseconds of samples
 	uint32_t work_running;
@@ -22,9 +22,9 @@ typedef struct audio_processing {
 	double *hanning_window;
 
 	void *internals;
-} audio_processing;
+};
 
-typedef struct visualiser {
+struct visualiser {
 	// Raylib
 	uint32_t position_x;
 	uint32_t position_y;
@@ -47,19 +47,19 @@ typedef struct visualiser {
 	uint32_t freq_max;
 	uint32_t sensitivity;
 
-} visualiser;
+};
 
-typedef struct context {
+struct context {
 	// Global attributes
 	bool running;
 
 	// Visualisers
 	uint32_t vis_count;
-	visualiser *vis_array;
+	struct visualiser *vis_array;
 
 	// Audio Processing
-	audio_processing *processing;
+	struct audio_processing *processing;
 
 	// Performance and safety
 	MTY_Mutex *lock;
-} context;
+};

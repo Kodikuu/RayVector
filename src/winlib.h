@@ -1,7 +1,6 @@
+#pragma once
 #include <stdint.h>
 #include <Audioclient.h>
-
-#include "common.h"
 
 // init
 uint32_t audio_get_default_client(IAudioClient **);
