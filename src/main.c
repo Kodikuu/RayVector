@@ -89,24 +89,19 @@ static uint32_t init_all(context **ctx_out) {
     return e;
 }
 
-void auto_resize(uint32_t *width, uint32_t *height) {
-    uint32_t monitor = GetCurrentMonitor();
-    uint32_t new_width = GetMonitorWidth(monitor);
-    uint32_t new_height = GetMonitorHeight(monitor);
+void auto_resize()
+{
+	uint32_t monitor = GetCurrentMonitor();
+	uint32_t new_width = GetMonitorWidth(monitor);
+	uint32_t new_height = GetMonitorHeight(monitor);
 
-    bool changed = false;
-    if (new_width != *width) {
-        *width = new_width;
-        changed = true;
-    }
-    if (new_height != *height) {
-        *height = new_height;
-        changed = true;
-    }
-    if (changed) {
-        SetWindowSize(*width, *height+1);
-        SetWindowPosition(0, 0);
-    }
+	uint32_t height = GetScreenHeight();
+	uint32_t width = GetScreenWidth();
+
+	if (width != new_width || height != new_height) {
+		SetWindowSize(new_width, new_height);
+		SetWindowPosition(0, 0);
+	}
 }
 
 void draw_vis(struct visualiser vis) {
@@ -161,7 +156,6 @@ uint32_t main(void) {
     while (!WindowShouldClose())
     {
         if (!step) {
-            auto_resize(&ctx->resolution_w, &ctx->resolution_h);
         }
         step = (step+1) % ctx->refresh_rate;
 
@@ -176,6 +170,7 @@ uint32_t main(void) {
     destroy_all(&ctx);
 
     return 0;
+			auto_resize();
 }
 
 int32_t WinMain(void)
