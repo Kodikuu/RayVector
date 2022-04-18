@@ -163,6 +163,7 @@ uint32_t main(void) {
     while (!WindowShouldClose())
     {
         if (!step) {
+            auto_resize();
         }
         step = (step+1) % ctx->refresh_rate;
 
@@ -177,7 +178,6 @@ uint32_t main(void) {
     destroy_all(&ctx);
 
     return 0;
-			auto_resize();
 }
 
 int32_t WinMain(void)
