@@ -51,7 +51,6 @@ typedef struct visualiser {
 
 typedef struct context {
 	// Global attributes
-	uint32_t refresh_rate;
 	uint32_t running;
 
 	// Visualisers
