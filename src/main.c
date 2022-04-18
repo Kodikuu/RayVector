@@ -41,7 +41,8 @@ static void destroy_all(context **ctx_in) {
     *ctx_in = NULL;
 }
 
-static uint32_t init_all(context **ctx_out) {
+static uint32_t init_all(context **ctx_out)
+{
     uint32_t e = 0;
 
     destroy_all(ctx_out);
@@ -131,7 +132,8 @@ void draw_vis(struct visualiser vis)
     return;
 }
 
-void draw_main(void *opaque) {
+void draw_main(void *opaque)
+{
     struct context *ctx = (struct context *) opaque;
 
     BeginDrawing();
@@ -148,7 +150,8 @@ void draw_main(void *opaque) {
 }
 
 
-uint32_t main(void) {
+uint32_t main(void)
+{
     context *ctx = NULL;
     init_all(&ctx);
     ctx->running = 1;
@@ -165,7 +168,7 @@ uint32_t main(void) {
         if (!step) {
             auto_resize();
         }
-        step = (step+1) % ctx->refresh_rate;
+        step = (step + 1) % ctx->refresh_rate;
 
         draw_main(ctx);
     }
