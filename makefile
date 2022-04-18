@@ -45,5 +45,9 @@ all: $(OBJS)
 	link $(BUILD) $(LIBS) /LTCG /subsystem:console /NODEFAULTLIB:LIBCMT
 	del *.obj
 
+release: $(OBJS)
+	link $(BUILD) $(LIBS) /LTCG /subsystem:windows /NODEFAULTLIB:LIBCMT
+	del *.obj
+
 run:
 	.\main.exe
