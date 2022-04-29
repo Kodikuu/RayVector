@@ -158,7 +158,7 @@ uint32_t main(void)
 	ctx->running = true;
 	MTY_Thread *thread = MTY_ThreadCreate((MTY_ThreadFunc) work_thread, ctx);
 
-	SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
+	SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TRANSPARENT | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_UNFOCUSED);
 	InitWindow(1, 1, "RayVector");
 	SetFlags(GetWindowHandle());
 
