@@ -5,6 +5,7 @@ OBJS = \
 	src/main.obj \
 	src/winlib.obj \
 	src/audio.obj \
+	src/displayinfo.obj\
 	src/kiss_fft130/kiss_fftr.obj \
 	src/kiss_fft130/kiss_fft.obj \
 
@@ -12,6 +13,7 @@ BUILD = \
 	main.obj \
 	winlib.obj \
 	audio.obj \
+	displayinfo.obj\
 	kiss_fftr.obj \
 	kiss_fft.obj \
 
