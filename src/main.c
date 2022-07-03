@@ -106,8 +106,6 @@ void auto_resize(struct bounds *bnds)
 	uint32_t width = GetScreenWidth();
 	Vector2 position = GetWindowPosition();
 
-	//printf_s("||DEBUG|| Old Dimensions: %ux%u \n\t New Dimensions: %ux%u\n", width, height, new_width, new_height);
-
 	if (width != new_width || height != new_height || (int32_t) position.x != new_x_position || (int32_t) position.y != new_y_position)
 	{
 		SetWindowSize(new_width, new_height);
@@ -116,7 +114,7 @@ void auto_resize(struct bounds *bnds)
 }
 
 
-void draw_vis(struct visualiser vis, struct display disp)// ACCOUNT FOR TASKBAR HERE
+void draw_vis(struct visualiser vis, struct display disp)// TODO - ACCOUNT FOR TASKBAR HERE
 {
 	float y0 = (float) disp.rel_y + disp.height;
 	float x0 = (float) disp.rel_x;
