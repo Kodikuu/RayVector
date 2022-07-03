@@ -26,10 +26,7 @@ struct audio_processing {
 
 struct visualiser {
 	// Raylib
-	uint32_t position_x;
-	uint32_t position_y;
 	uint32_t height;
-	uint32_t width;
 
 #ifdef Color
 	Color colour;
@@ -46,7 +43,6 @@ struct visualiser {
 	uint32_t freq_min;
 	uint32_t freq_max;
 	uint32_t sensitivity;
-
 };
 
 struct context {
@@ -62,4 +58,41 @@ struct context {
 
 	// Performance and safety
 	MTY_Mutex *lock;
+};
+
+struct display {
+	// Absolute Position of a display
+	int32_t abs_x;
+	int32_t abs_y;
+
+	// Relative position of a display
+	uint32_t rel_x;
+	uint32_t rel_y;
+
+	// Dimensions
+	uint32_t width;
+	uint32_t height;
+};
+
+struct display_list {
+	uint16_t disp_count;
+	uint16_t array_size;
+	struct display *disp_array;
+};
+
+struct bounds {
+	// X Bounds
+	int32_t x_min;
+	int32_t x_max;
+
+	// Y Bounds
+	int32_t y_min;
+	int32_t y_max;
+
+	// Dimensions
+	uint32_t width;
+	uint32_t height;
+
+	// Displays
+	struct display_list *displays; 
 };
